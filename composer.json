@@ -1,0 +1,11 @@
+{
+	"require":{
+		"firebase/php-jwt": "^5.0"
+	},
+	"autoload": {
+		"files": ["helper/common.helper.php"],
+        "psr-4": {
+            "GHank\\WSNotice\\": "src"
+        }
+    }
+}
