@@ -37,14 +37,14 @@ class WebsocketServer
     public static function handleOpen($server, $request)
     {
         // 接受请求携带的jwt票据信息，如果不存在，拒绝链接
-    	if (!isset($request->get) || !isset($request->get['jwt'])) {
+    	if (!isset($request->get) || !isset($request->get['token'])) {
     		static::$server->close($request->fd);
     		return false;
     	}
 
         // 尝试解析jwt票据信息，解析出错，代表用户身份有误，拒绝链接
         try{
-            $decoded = JWT::decode($request->get['jwt'], config('secure.token_salt'), array('HS256'));
+            $decoded = JWT::decode($request->get['token'], config('secure.token_salt'), array('HS256'));
         } catch (\Exception $e) {
             static::handleClose($request->fd, $e->getMessage());
             return false;
@@ -65,6 +65,8 @@ class WebsocketServer
         }
 
     	$event = convertObliqueLine($fromData->event);
+
+        var_dump($event);
 
         //  将发送信息的事件映射到事件处理器中，处理器存在该事件，绑定为事件驱动
     	if ($event && method_exists(static::$eventHandler, $event)) {
@@ -87,7 +89,7 @@ class WebsocketServer
         }
         
         // 关闭连接
-        static::$server->close($fd);
+        static::$server->close(intval($fd));
     }
 
     public function run()
