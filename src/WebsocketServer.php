@@ -66,6 +66,8 @@ class WebsocketServer
 
     	$event = convertObliqueLine($fromData->event);
 
+        var_dump($event);
+
         //  将发送信息的事件映射到事件处理器中，处理器存在该事件，绑定为事件驱动
     	if ($event && method_exists(static::$eventHandler, $event)) {
     		static::$eventHandler::$event($frame->fd, $fromData);
@@ -87,7 +89,7 @@ class WebsocketServer
         }
         
         // 关闭连接
-        static::$server->close($fd);
+        static::$server->close(intval($fd));
     }
 
     public function run()

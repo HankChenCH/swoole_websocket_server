@@ -24,7 +24,13 @@ class EventHandler
 
 	public static function payNotice($from, $data)
 	{
-		static::broadcast($from, $data);
+		$event = humpToLine(__FUNCTION__);
+		static::broadcast($from, function ($fd) use ($data, $event) {
+			static::$server->push($fd, json_encode([
+				'data' => $data,
+				'event' => $event,
+			]));
+		});
 	}
 
 	public static function onlineCount($from, $data)
