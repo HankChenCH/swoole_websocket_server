@@ -44,7 +44,7 @@ class WebsocketServer
 
         // 尝试解析jwt票据信息，解析出错，代表用户身份有误，拒绝链接
         try{
-            $decoded = JWT::decode($request->get['token'], md5(config('secure.token_salt') . getClientIp($request)), array('HS256'));
+            $decoded = JWT::decode($request->get['token'], md5(config('secure.token_salt') . $request->get['ip']), array('HS256'));
         } catch (\Exception $e) {
             static::handleClose($request->fd, $e->getMessage());
             return false;
@@ -65,8 +65,6 @@ class WebsocketServer
         }
 
     	$event = convertObliqueLine($fromData->event);
-
-        var_dump($event);
 
         //  将发送信息的事件映射到事件处理器中，处理器存在该事件，绑定为事件驱动
     	if ($event && method_exists(static::$eventHandler, $event)) {
