@@ -64,8 +64,10 @@ if (!function_exists('deep_array_search')) {
 }
 
 if (!function_exists('getClientIp')) {
-	function getClientIP()  
+	function getClientIP($request)  
 	{  
+		$_SERVER = $request->server;
+		
 	    if (@$_SERVER["HTTP_X_FORWARDED_FOR"])  
 	    $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];  
 	    else if (@$_SERVER["HTTP_CLIENT_IP"])  
