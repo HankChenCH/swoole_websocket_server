@@ -44,7 +44,7 @@ class WebsocketServer
 
         // 尝试解析jwt票据信息，解析出错，代表用户身份有误，拒绝链接
         try{
-            $decoded = JWT::decode($request->get['token'], md5(config('secure.token_salt') . getClientIp()), array('HS256'));
+            $decoded = JWT::decode($request->get['token'], md5(config('secure.token_salt') . getClientIp($request)), array('HS256'));
         } catch (\Exception $e) {
             static::handleClose($request->fd, $e->getMessage());
             return false;
