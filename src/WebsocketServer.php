@@ -53,6 +53,7 @@ class WebsocketServer
         static::$userTable->set($request->fd, ["fd" => $request->fd, "userType" => $decoded->aud, "uid" => $decoded->user->uid]);
 
         static::$eventHandler::onlineNotice($request->fd, $decoded);
+	//static::$eventHandler::callEventHandler(null, (object)['event'=> $decoded->aud . '/online/count']);
     }
 
     public static function handleMsg($server, $frame)
@@ -64,12 +65,14 @@ class WebsocketServer
             return false;
         }
 
-    	$event = convertObliqueLine($fromData->event);
+    	//$event = convertObliqueLine($fromData->event);
 
         //  将发送信息的事件映射到事件处理器中，处理器存在该事件，绑定为事件驱动
-    	if ($event && method_exists(static::$eventHandler, $event)) {
-    		static::$eventHandler::$event($frame->fd, $fromData);
-    	}
+    	//if ($event && method_exists(static::$eventHandler, $event)) {
+    		//static::$eventHandler::$event($frame->fd, $fromData);
+    	//}
+
+	static::$eventHandler::callEventHandler($frame, $fromData);
     }
 
     /**
