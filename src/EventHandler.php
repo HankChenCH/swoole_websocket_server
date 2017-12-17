@@ -83,7 +83,12 @@ class EventHandler
 
         protected static function push($from, $data)
         {
-	    $data['event'] = static::$event;
+	    if (is_array($data)) {
+		$data['event'] = static::$event;
+	    } else {
+		$data->event = static::$event;
+	    }
+	    //$data->event = static::$event;
             static::$server->push($from, json_encode($data));
         }
 
