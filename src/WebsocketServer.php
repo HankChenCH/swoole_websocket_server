@@ -10,15 +10,12 @@ class WebsocketServer
 {
 	public static $server;
 
-	public static $eventHandler;
-
 	public static $userTable;
 
 	public function __construct() 
     {
         static::$server = new swoole_websocket_server("0.0.0.0", 9502);
         static::$userTable = new swoole_table(1024);
-        static::$eventHandler = new EventHandler($this);
 
         static::$server->set(config('server'));
 
@@ -32,6 +29,8 @@ class WebsocketServer
         static::$userTable->column('userType', swoole_table::TYPE_STRING, 256);
         static::$userTable->column('uid', swoole_table::TYPE_INT, 8);
         static::$userTable->create();
+
+        new SL($this);
     }
 
     public static function handleOpen($server, $request)
@@ -52,8 +51,7 @@ class WebsocketServer
 
         static::$userTable->set($request->fd, ["fd" => $request->fd, "userType" => $decoded->aud, "uid" => $decoded->user->uid]);
 
-        static::$eventHandler::onlineNotice($request->fd, $decoded);
-	//static::$eventHandler::callEventHandler(null, (object)['event'=> $decoded->aud . '/online/count']);
+        \app\event\BaseEvent::onlineNotice($request->fd, $decoded);
     }
 
     public static function handleMsg($server, $frame)
@@ -65,14 +63,7 @@ class WebsocketServer
             return false;
         }
 
-    	//$event = convertObliqueLine($fromData->event);
-
-        //  将发送信息的事件映射到事件处理器中，处理器存在该事件，绑定为事件驱动
-    	//if ($event && method_exists(static::$eventHandler, $event)) {
-    		//static::$eventHandler::$event($frame->fd, $fromData);
-    	//}
-
-	static::$eventHandler::callEventHandler($frame, $fromData);
+    	EventHandler::callEvent($frame, $fromData);
     }
 
     /**
@@ -82,15 +73,12 @@ class WebsocketServer
      */
     public static function handleClose($ser, $fd)
     {
-        static::$eventHandler::offlineNotice($fd);
+        \app\event\BaseEvent::offlineNotice($fd);
 
         // 删除映射关系
         if (static::$userTable->exist($fd)) {
             static::$userTable->del($fd);
         }
-        
-        // 关闭连接
-        static::$server->close(intval($fd));
     }
 
     public function run()

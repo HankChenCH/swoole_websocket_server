@@ -5,7 +5,8 @@
 	"autoload": {
 		"files": ["helper/common.helper.php"],
         "psr-4": {
-            "GHank\\WSNotice\\": "src"
+            "GHank\\WSNotice\\": "src/",
+            "app\\": "application/"
         }
     }
 }
