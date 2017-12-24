@@ -36,7 +36,7 @@ class WebsocketServer
     public static function handleOpen($server, $request)
     {
         // 接受请求携带的jwt票据信息，如果不存在，拒绝链接
-    	if (!isset($request->get) || !isset($request->get['token'])) {
+    	if (!isset($request->get) || !isset($request->get['token']) || !isset($request->get['ip'])) {
     		static::$server->close($request->fd);
     		return false;
     	}
@@ -63,6 +63,7 @@ class WebsocketServer
             return false;
         }
 
+        var_dump($fromData->event);
     	EventHandler::callEvent($frame, $fromData);
     }
 

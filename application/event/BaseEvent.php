@@ -10,14 +10,15 @@ class BaseEvent extends Event
 {
 	public static function onlineNotice($from, $userInfo)
 	{
-		$event = humpToLine(__FUNCTION__);
-        self::broadcast($from, function ($fd) use ($userInfo, $event) {
+		// var_dump($userInfo);
+        self::broadcast($from, function ($fd) use ($userInfo) {
         	$user = SL::$app->userTable->get($fd);
 			if ($user && $user['userType'] === $userInfo->aud) {
+				// var_dump($user);
 				self::push($fd, json_encode([
 					'uid' => $userInfo->user->uid,
 					'userType' => $userInfo->aud,
-					'event' => $event,
+					'event' => 'online/notice',
 				]));
 			}
         });
@@ -25,15 +26,14 @@ class BaseEvent extends Event
 
 	public static function offlineNotice($from)
 	{
-		$event = humpToLine(__FUNCTION__);
     	$fromUser = SL::$app->userTable->get($from);
-        self::broadcast($from, function ($fd) use ($fromUser, $event){
+        self::broadcast($from, function ($fd) use ($fromUser){
 			$user = SL::$app->userTable->get($fd);
 			if ($user && $user['userType'] === $fromUser['userType']) {
 				self::push($fd, json_encode([
 					'uid' => $fromUser['uid'],
 					'userType' => $fromUser['userType'],
-					'event' => $event,
+					'event' => 'offline/notice',
 				]));
 			}
         });

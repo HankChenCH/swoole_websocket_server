@@ -1,6 +1,8 @@
 <?php
 
-namespace app\event;
+namespace app\event\weapp;
+
+use app\event\BaseEvent;
 
 class Theme extends BaseEvent
 {
